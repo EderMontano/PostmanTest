@@ -1,0 +1,497 @@
+{
+	"info": {
+		"_postman_id": "b6fb6572-6fec-4e00-8048-6e2d2cf0a8bc",
+		"name": "Proyecto-Curso-SegundaMano-Automate",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Crear un usuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ed83b9e7-a1ba-4d09-bb4f-ac5a39b6d899",
+						"exec": [
+							"var jsonData = pm.response.json()",
+							"pm.environment.set(\"accessToken\", jsonData.access_token)",
+							"pm.environment.set(\"account_ID\", jsonData.account.account_id)",
+							"pm.environment.set(\"name\", jsonData.account.name)",
+							"pm.environment.set(\"uuid\", jsonData.account.uuid)",
+							"",
+							"var accessToken = pm.environment.get(\"accessToken\")",
+							"var uuid = pm.environment.get(\"uuid\");",
+							"",
+							"var preencode = (uuid).concat(\":\",(accessToken))",
+							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
+							"    pm.environment.set(\"base64-2\", encoded)",
+							"",
+							"let cadena = Math.floor(Math.random() * Math.floor(99999999999999999)+10000);",
+							"var body = \"servicios de \" + cadena.toString(36) + (\" \") + cadena.toString(36);",
+							"pm.environment.set(\"body\", body);",
+							"",
+							"let titulo = Math.floor(Math.random() * Math.floor(99999999999999999)+10000);",
+							"var subject = cadena.toString(36) + (\" \") + cadena.toString(36);",
+							"pm.environment.set(\"subject\", subject);",
+							"",
+							"let tel = Math.floor(Math.random() * 9999999999) + 1000000000;",
+							"pm.environment.set(\"telephone\", tel)",
+							"",
+							"pm.test(\"Validar status 201\", function() {",
+							"  pm.response.to.have.status(201)  ",
+							"})",
+							"",
+							"pm.test(\"Test - Validar tiempo de respuesta menor a 3 segundos\", function (){",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000)",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2fd9e028-365e-44ff-b5a3-a3f88e7298fd",
+						"exec": [
+							"let correo = Math.floor(Math.random() * Math.floor(99999999999999999)+10000);",
+							"var mail = correo.toString(36)+\"@mailinator.com\";",
+							"pm.environment.set(\"mail\", mail)",
+							"console.log(mail);",
+							"",
+							"var preencode = (pm.environment.get(\"mail\")).concat(\":\",(pm.environment.get(\"password\")))",
+							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
+							"    pm.environment.set(\"base64\", encoded)",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{base64}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"account\": {\"email\": \"{{mail}}\"}}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.1/private/accounts",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.1",
+						"private",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Añadir Telefono y direccion",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9dc98c5e-4f68-40bb-ba7d-c342b29093e8",
+						"exec": [
+							"var jsonData = pm.response.json()",
+							"var mail = pm.environment.get(mail)",
+							"",
+							"pm.test(\"Validar status 200\", function(){",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.test(\"Validar valor can_publish\", function(){",
+							"    pm.expect(jsonData.account.can_publish).eql(true)",
+							"})",
+							"",
+							"pm.test(\"Test - Validar tiempo de respuesta menor a 3 segundos\", function (){",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000)",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json;charset=UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"account\":{\"name\":\"{{name}}\",\"phone\":\"{{telephone}}\", \"locations\":[{\"code\":\"31\",\"key\":\"region\",\"label\":\"Tlaxcala\",\"locations\":[{\"code\":\"2071\",\"key\":\"municipality\",\"label\":\"Xaloztoc\"}]}], \"phone_hidden\": true}}"
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1{{account_ID}}",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1{{account_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consulta usuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1c3fc3ed-b3f4-4d9a-b5f8-3a48831a9174",
+						"exec": [
+							"let jsonData = pm.response.json",
+							"",
+							"pm.test(\"To validate status 200\", function (){",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.test(\"Test - Validar tiempo de respuesta menor a 3 segundos\", function (){",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000)",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-nga-source",
+						"value": "PHOENIX_DESKTOP",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.7{{account_ID}}",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.7{{account_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear un anuncio nuevo",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "003ae179-6959-42db-862a-22c04b9a1117",
+						"exec": [
+							"var preencode = (pm.environment.get(\"mail\")).concat(\":\",(pm.environment.get(\"password\")))",
+							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
+							"    pm.environment.set(\"base64\", encoded)",
+							"    ",
+							"var authorization2 = \"Basic \".concat(pm.environment.get(\"base64\"))",
+							"console.log(authorization2)",
+							"let getTokenRequest = {",
+							"    method: 'POST',",
+							"    url: 'https://webapi.segundamano.mx/nga/api/v1.7/private/accounts',",
+							"    header: {",
+							"        Authorization: authorization2",
+							"    }",
+							"}",
+							"",
+							"pm.sendRequest(getTokenRequest, (err, response) => {",
+							"    var jsonResponse = response.json(),",
+							"        newAccessToken = jsonResponse.access_token;",
+							"        console.log(newAccessToken);",
+							"    pm.environment.set('accessToken', newAccessToken);",
+							"    pm.variables.set('accessToken', newAccessToken);",
+							"    console.log({ err, response, newAccessToken });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a64ca71-9377-4959-b18b-99123e460c73",
+						"exec": [
+							"var jsonData = pm.response.json()",
+							"var anuncioID = jsonData.ad.ad_id",
+							"var anuncioID = anuncioID.split('/')[5]",
+							"pm.environment.set(\"anuncioID\", anuncioID)",
+							"",
+							"pm.test(\"Validar status 201\", function() {",
+							"  pm.response.to.have.status(201)  ",
+							"})",
+							"",
+							"pm.test(\"Validar el action type\", function() {",
+							"    pm.expect(jsonData.action.action_type).to.eql(\"new\")",
+							"})",
+							"",
+							"pm.test(\"Test - Validar tiempo de respuesta menor a 4 segundos\", function (){",
+							"    pm.expect(pm.response.responseTime).to.be.below(4000)",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "x-nga-source",
+						"value": "PHOENIX_DESKTOP",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"ad\":{\"locations\":[{\"code\":\"33\",\"key\":\"region\",\"label\":\"Yucatán\",\"locations\":[{\"code\":\"2383\",\"key\":\"municipality\",\"label\":\"Ucú\",\"locations\":[{\"code\":\"85459\",\"key\":\"area\",\"label\":\"Ucu\"}]}]}],\"subject\":\"Utensilios Momotex\",\"body\":\"{{body}}\",\"category\":{\"code\":\"3042\"},\"images\":[],\"price\":{\"currency\":\"mxn\",\"price_value\":1},\"ad_details\":{},\"phone_hidden\":1,\"plate\":\"\",\"vin\":\"\",\"type\":{\"code\":\"s\",\"label\":\"\"},\"ad\":\"Utensilios Momotex\"},\"category_suggestion\":false,\"commit\":true}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.7{{account_ID}}/klfst",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.7{{account_ID}}",
+						"klfst"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar anuncios",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "52c2a84a-1d64-4ebf-ab06-0ce097dffcf7",
+						"exec": [
+							"pm.test(\"To validate status 200\", function (){",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.test(\"Test - Validar tiempo de respuesta menor a 3 segundos\", function (){",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "x-nga-source",
+						"value": "PHOENIX_DESKTOP",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.7{{account_ID}}/klfst/{{anuncioID}}",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.7{{account_ID}}",
+						"klfst",
+						"{{anuncioID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Editar un anuncio",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6301e722-bbcc-44e2-b383-d1ff1b10918e",
+						"exec": [
+							"var preencode = (pm.environment.get(\"mail\")).concat(\":\",(pm.environment.get(\"password\")))",
+							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
+							"    pm.environment.set(\"base64\", encoded)",
+							"    ",
+							"var authorization2 = \"Basic \".concat(pm.environment.get(\"base64\"))",
+							"console.log(authorization2)",
+							"let getTokenRequest = {",
+							"    method: 'POST',",
+							"    url: 'https://webapi.segundamano.mx/nga/api/v1.7/private/accounts',",
+							"    header: {",
+							"        Authorization: authorization2",
+							"    }",
+							"}",
+							"",
+							"pm.sendRequest(getTokenRequest, (err, response) => {",
+							"    var jsonResponse = response.json(),",
+							"        newAccessToken = jsonResponse.access_token;",
+							"        console.log(newAccessToken);",
+							"    pm.environment.set('accessToken', newAccessToken);",
+							"    pm.variables.set('accessToken', newAccessToken);",
+							"    console.log({ err, response, newAccessToken });",
+							"})",
+							"",
+							"let cadena = Math.floor(Math.random() * Math.floor(99999999999999999)+10000);",
+							"var body = \"servicios de \" + cadena.toString(36) + (\" \") + cadena.toString(36);",
+							"pm.environment.set(\"body\", body);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "62e68814-07b4-4a12-973d-fb64159dbdee",
+						"exec": [
+							"var jsonData = pm.response.json()",
+							"var anuncioUrl = jsonData.action.action_id",
+							"pm.environment.set(\"anuncioUrl\",anuncioUrl)",
+							"",
+							"pm.test(\"Validar status\", function(){",
+							"    pm.response.to.have.status(201)",
+							"})",
+							"",
+							"pm.test(\"Validar action type\", function(){",
+							"  pm.expect(jsonData.action.action_type).is.eql(\"edit\")  ",
+							"})",
+							"",
+							"",
+							"pm.test(\"Test - Validar tiempo de respuesta menor a 6 segundos\", function (){",
+							"    pm.expect(pm.response.responseTime).to.be.below(6000)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "x-nga-source",
+						"value": "PHOENIX_DESKTOP",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"ad\":{\"locations\":[{\"code\":\"33\",\"key\":\"region\",\"label\":\"Yucatán\",\"locations\":[{\"code\":\"2383\",\"key\":\"municipality\",\"label\":\"Ucú\",\"locations\":[{\"code\":\"85459\",\"key\":\"area\",\"label\":\"Ucu\"}]}]}],\"subject\":\"Utencilios Momotex\",\"body\":\"{{body}}\",\"category\":{\"code\":\"3042\"},\"images\":[],\"price\":{\"currency\":\"MXN\",\"price_value\":1},\"ad_details\":{},\"phone_hidden\":1,\"type\":{\"code\":\"s\",\"label\":\"\"},\"adId\":\"{{anuncioID}}\"},\"category_suggestion\":false,\"commit\":true}"
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.7{{account_ID}}/klfst/{{anuncioID}}/actions",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.7{{account_ID}}",
+						"klfst",
+						"{{anuncioID}}",
+						"actions"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
