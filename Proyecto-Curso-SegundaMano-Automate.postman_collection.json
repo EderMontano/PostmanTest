@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b6fb6572-6fec-4e00-8048-6e2d2cf0a8bc",
+		"_postman_id": "4dcb09c3-17cf-484a-987f-8f6697e6d7aa",
 		"name": "Proyecto-Curso-SegundaMano-Automate",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ed83b9e7-a1ba-4d09-bb4f-ac5a39b6d899",
+						"id": "a9c3e013-be2d-484d-bd54-2cb151cc42c5",
 						"exec": [
 							"var jsonData = pm.response.json()",
 							"pm.environment.set(\"accessToken\", jsonData.access_token)",
@@ -53,7 +53,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "2fd9e028-365e-44ff-b5a3-a3f88e7298fd",
+						"id": "03501b2f-a5f5-4cb7-ae44-78e94a569156",
 						"exec": [
 							"let correo = Math.floor(Math.random() * Math.floor(99999999999999999)+10000);",
 							"var mail = correo.toString(36)+\"@mailinator.com\";",
@@ -117,7 +117,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9dc98c5e-4f68-40bb-ba7d-c342b29093e8",
+						"id": "1d5d8bea-a203-49ff-9042-898d47a23b33",
 						"exec": [
 							"var jsonData = pm.response.json()",
 							"var mail = pm.environment.get(mail)",
@@ -179,13 +179,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "1c3fc3ed-b3f4-4d9a-b5f8-3a48831a9174",
+						"id": "8738fa5c-eead-4fa2-bb98-b690189acfc6",
 						"exec": [
 							"let jsonData = pm.response.json",
 							"",
 							"pm.test(\"To validate status 200\", function (){",
 							"    pm.response.to.have.status(200)",
 							"})",
+							"",
+							"pm.test(\"Validar_json\", function() { ",
+							"    pm.response.to.be.json",
+							"});",
 							"",
 							"pm.test(\"Test - Validar tiempo de respuesta menor a 3 segundos\", function (){",
 							"    pm.expect(pm.response.responseTime).to.be.below(3000)",
@@ -236,7 +240,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "003ae179-6959-42db-862a-22c04b9a1117",
+						"id": "25fbb58e-6506-4a7c-a1a9-a8e0983847bb",
 						"exec": [
 							"var preencode = (pm.environment.get(\"mail\")).concat(\":\",(pm.environment.get(\"password\")))",
 							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
@@ -267,7 +271,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4a64ca71-9377-4959-b18b-99123e460c73",
+						"id": "13a59f0f-3c87-4663-b5ae-6b429d55c5d2",
 						"exec": [
 							"var jsonData = pm.response.json()",
 							"var anuncioID = jsonData.ad.ad_id",
@@ -337,7 +341,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "52c2a84a-1d64-4ebf-ab06-0ce097dffcf7",
+						"id": "d0edeb02-544a-43bc-9536-2f430dfc1394",
 						"exec": [
 							"pm.test(\"To validate status 200\", function (){",
 							"    pm.response.to.have.status(200)",
@@ -393,7 +397,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "6301e722-bbcc-44e2-b383-d1ff1b10918e",
+						"id": "83f83781-63ca-4143-a2e0-6c959a6e2f3c",
 						"exec": [
 							"var preencode = (pm.environment.get(\"mail\")).concat(\":\",(pm.environment.get(\"password\")))",
 							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
@@ -428,7 +432,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "62e68814-07b4-4a12-973d-fb64159dbdee",
+						"id": "7554c1f4-2970-43a3-bc8f-93b99b279948",
 						"exec": [
 							"var jsonData = pm.response.json()",
 							"var anuncioUrl = jsonData.action.action_id",
