@@ -1,53 +1,145 @@
 {
 	"info": {
-		"_postman_id": "4632ade8-851e-48a8-8d1e-af1e1821aa38",
+		"_postman_id": "b6557b4b-b56c-43e8-bcfa-6871390adc5e",
 		"name": "Proyecto-Curso-SegundaMano-Automate",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "Intentar crear un usuario con un email erroneo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f63a90e7-1764-4b49-9378-78814ed0abf3",
+						"exec": [
+							"",
+							"pm.test(\"Validar status BAD REQUEST\", function () {",
+							"  pm.response.to.have.status(400)",
+							"})",
+							"",
+							"pm.test(\"Validar error code\", function (){",
+							"  pm.expect(pm.response.text()).to.include(\"ERROR_AUTH_LOGIN\")",
+							"})",
+							"",
+							"pm.test(\"Validar field\", function (){",
+							"  pm.expect(pm.response.text()).to.include(\"email\")",
+							"})",
+							"",
+							"pm.test(\"Test - Validar tiempo de respuesta menor a 2 segundos\", function () {",
+							"  pm.expect(pm.response.responseTime).to.be.below(2000)",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "93c9ff3b-b922-4834-a50e-809fda538586",
+						"exec": [
+							"let correo = Math.floor(Math.random() * Math.floor(99999999999999999) + 10000);",
+							"var mail = \"agente\" + correo.toString(36) + \"mailinator.com\";",
+							"pm.environment.set(\"mail\", mail)",
+							"console.log(mail);",
+							"",
+							"var preencode = (pm.environment.get(\"mail\")).concat(\":\", (pm.environment.get(\"password\")))",
+							"var encoded = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
+							"pm.environment.set(\"base64\", encoded)",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic {{base64}}"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"account\": {\"email\": \"{{mail}}\"}}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.1/private/accounts",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.1",
+						"private",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
 		{
 			"name": "Crear un usuario",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "6ff0c395-8f48-40b5-a257-a2ba43450293",
+						"id": "f435fa79-368e-42e4-8ee6-c7ae7c1281ba",
 						"exec": [
 							"var jsonData = pm.response.json()",
 							"pm.environment.set(\"accessToken\", jsonData.access_token)",
-							"pm.environment.set(\"account_ID\", jsonData.account.account_id)",
+							"pm.environment.set(\"url_account_ID\", jsonData.account.account_id)",
 							"pm.environment.set(\"name\", jsonData.account.name)",
 							"pm.environment.set(\"uuid\", jsonData.account.uuid)",
+							"pm.environment.set(\"accountId\", jsonData.account.account_id.split(\"/\")[3])",
 							"",
 							"var accessToken = pm.environment.get(\"accessToken\")",
 							"var uuid = pm.environment.get(\"uuid\");",
 							"",
-							"var preencode = (uuid).concat(\":\",(accessToken))",
-							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
-							"    pm.environment.set(\"base64-2\", encoded)",
+							"var preencode = (uuid).concat(\":\", (accessToken))",
+							"var encoded = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
+							"pm.environment.set(\"base64-2\", encoded)",
 							"",
-							"let cadena = Math.floor(Math.random() * Math.floor(99999999999999999)+10000);",
+							"let cadena = Math.floor(Math.random() * Math.floor(99999999999999999) + 10000);",
 							"var body = \"servicios de \" + cadena.toString(36) + (\" \") + cadena.toString(36);",
 							"pm.environment.set(\"body\", body);",
 							"",
-							"let titulo = Math.floor(Math.random() * Math.floor(99999999999999999)+10000);",
+							"let titulo = Math.floor(Math.random() * Math.floor(99999999999999999) + 10000);",
 							"var subject = cadena.toString(36) + (\" \") + cadena.toString(36);",
 							"pm.environment.set(\"subject\", subject);",
 							"",
 							"let tel = Math.floor(Math.random() * 9999999999) + 1000000000;",
 							"pm.environment.set(\"telephone\", tel)",
 							"",
-							"pm.test(\"Validar status 201\", function() {",
-							"  pm.response.to.have.status(201)  ",
+							"pm.test(\"Validar status 201\", function () {",
+							"  pm.response.to.have.status(201)",
 							"})",
 							"",
-							"pm.test(\"Test - Validar tiempo de respuesta menor a 3 segundos\", function (){",
-							"    pm.expect(pm.response.responseTime).to.be.below(3000)",
+							"pm.test(\"Test - Validar tiempo de respuesta menor a 3 segundos\", function () {",
+							"  pm.expect(pm.response.responseTime).to.be.below(3000)",
 							"})",
 							"",
 							"//prueba vero",
-							"pm.test(\"Validar status Created\", function() {",
-							"  pm.response.to.have.status(201)  ",
+							"pm.test(\"Validar status Created\", function () {",
+							"  pm.response.to.have.status(201)",
 							"})",
 							""
 						],
@@ -57,7 +149,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "5bad4614-0a3c-4992-bee3-57d2dd26b480",
+						"id": "195518c6-35e8-4999-98a4-444dbe126e0f",
 						"exec": [
 							"let correo = Math.floor(Math.random() * Math.floor(99999999999999999)+10000);",
 							"var mail = correo.toString(36)+\"@mailinator.com\";",
@@ -121,7 +213,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c0f9020e-e854-4fb5-b4f9-e9d1b66a2c69",
+						"id": "87a336bf-443b-4036-aac4-3c13343ae116",
 						"exec": [
 							"var jsonData = pm.response.json()",
 							"var mail = pm.environment.get(mail)",
@@ -163,7 +255,7 @@
 					"raw": "{\"account\":{\"name\":\"{{name}}\",\"phone\":\"{{telephone}}\", \"locations\":[{\"code\":\"31\",\"key\":\"region\",\"label\":\"Tlaxcala\",\"locations\":[{\"code\":\"2071\",\"key\":\"municipality\",\"label\":\"Xaloztoc\"}]}], \"phone_hidden\": true}}"
 				},
 				"url": {
-					"raw": "https://{{base_url}}/nga/api/v1{{account_ID}}",
+					"raw": "https://{{base_url}}/nga/api/v1{{url_account_ID}}",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
@@ -171,7 +263,124 @@
 					"path": [
 						"nga",
 						"api",
-						"v1{{account_ID}}"
+						"v1{{url_account_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agregar Direccion",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "396d4c2b-c4c7-4ad7-a0be-188cfe0766a7",
+						"exec": [
+							"var accessToken = pm.environment.get(\"accessToken\")\r",
+							"var uuid = pm.environment.get(\"uuid\");\r",
+							"\r",
+							"var preencode = (uuid).concat(\":\", (accessToken))\r",
+							"var encoded = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))\r",
+							"pm.environment.set(\"base64-2\", encoded)"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "de79ac8e-81ff-42d3-88e6-6eb91968339c",
+						"exec": [
+							"var jsonData = pm.response.json()\r",
+							"\r",
+							"var address = jsonData.addressID\r",
+							"\r",
+							"pm.environment.set(\"addressID\", address)\r",
+							"\r",
+							"pm.test(\"Validar Status Created\", function () {\r",
+							"    pm.response.to.have.status(201)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Validar Tiempo menor a cuatro segunfos de respuesta\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(4000)\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{base64-2}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "contact",
+							"value": "{{name}} {{name}}",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "{{telephone}}",
+							"type": "text"
+						},
+						{
+							"key": "rfc",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "zipCode",
+							"value": "76543",
+							"type": "text"
+						},
+						{
+							"key": "exteriorInfo",
+							"value": "ygiogtdtyf 765",
+							"type": "text"
+						},
+						{
+							"key": "region",
+							"value": "31",
+							"type": "text"
+						},
+						{
+							"key": "municipality",
+							"value": "2071",
+							"type": "text"
+						},
+						{
+							"key": "alias",
+							"value": "Casa",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{base_url}}/addresses/v1/create",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"addresses",
+						"v1",
+						"create"
 					]
 				}
 			},
@@ -183,7 +392,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f1cc32f1-56ea-4e9e-9219-1292d2c61712",
+						"id": "72383ef9-f42a-405e-b313-13fe053881a3",
 						"exec": [
 							"let jsonData = pm.response.json",
 							"",
@@ -220,7 +429,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{base_url}}/nga/api/v1.7{{account_ID}}",
+					"raw": "https://{{base_url}}/nga/api/v1.7{{url_account_ID}}",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
@@ -228,7 +437,7 @@
 					"path": [
 						"nga",
 						"api",
-						"v1.7{{account_ID}}"
+						"v1.7{{url_account_ID}}"
 					]
 				}
 			},
@@ -240,7 +449,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "f2dfb364-87e5-4b52-a050-5cacc00774dd",
+						"id": "4b0704e6-2faf-4ec0-bab6-00fd53a8943b",
 						"exec": [
 							"var preencode = (pm.environment.get(\"mail\")).concat(\":\",(pm.environment.get(\"password\")))",
 							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
@@ -271,7 +480,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "23b84afa-fd87-457d-ab8e-0f7e8a6df7f6",
+						"id": "55153061-b560-4986-ad4b-edbac017ef5c",
 						"exec": [
 							"var jsonData = pm.response.json()",
 							"var anuncioID = jsonData.ad.ad_id",
@@ -320,7 +529,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://{{base_url}}/nga/api/v1.7{{account_ID}}/klfst",
+					"raw": "https://{{base_url}}/nga/api/v1.7{{url_account_ID}}/klfst",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
@@ -328,7 +537,7 @@
 					"path": [
 						"nga",
 						"api",
-						"v1.7{{account_ID}}",
+						"v1.7{{url_account_ID}}",
 						"klfst"
 					]
 				}
@@ -341,7 +550,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c742f927-c3d4-4112-ac86-4589430a4c55",
+						"id": "12ed8e97-5981-44d8-9599-f5e517325630",
 						"exec": [
 							"pm.test(\"To validate status 200\", function (){",
 							"    pm.response.to.have.status(200)",
@@ -375,7 +584,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{base_url}}/nga/api/v1.7{{account_ID}}/klfst/{{anuncioID}}",
+					"raw": "https://{{base_url}}/nga/api/v1.7{{url_account_ID}}/klfst/{{anuncioID}}",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
@@ -383,7 +592,7 @@
 					"path": [
 						"nga",
 						"api",
-						"v1.7{{account_ID}}",
+						"v1.7{{url_account_ID}}",
 						"klfst",
 						"{{anuncioID}}"
 					]
@@ -397,7 +606,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "eb4225e7-0c07-4eb7-a9a2-fc7d722e2797",
+						"id": "ca30bb2d-c85d-44b1-8bc8-5f2afd2f089a",
 						"exec": [
 							"var preencode = (pm.environment.get(\"mail\")).concat(\":\",(pm.environment.get(\"password\")))",
 							"    var encoded=CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))",
@@ -432,7 +641,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "981a1721-1982-4142-a6a4-57c8edba516e",
+						"id": "9675965f-89df-4a57-888d-694f38f8414d",
 						"exec": [
 							"var jsonData = pm.response.json()",
 							"var anuncioUrl = jsonData.action.action_id",
@@ -479,7 +688,7 @@
 					"raw": "{\"ad\":{\"locations\":[{\"code\":\"33\",\"key\":\"region\",\"label\":\"Yucatán\",\"locations\":[{\"code\":\"2383\",\"key\":\"municipality\",\"label\":\"Ucú\",\"locations\":[{\"code\":\"85459\",\"key\":\"area\",\"label\":\"Ucu\"}]}]}],\"subject\":\"Utencilios Momotex\",\"body\":\"{{body}}\",\"category\":{\"code\":\"3042\"},\"images\":[],\"price\":{\"currency\":\"MXN\",\"price_value\":1},\"ad_details\":{},\"phone_hidden\":1,\"type\":{\"code\":\"s\",\"label\":\"\"},\"adId\":\"{{anuncioID}}\"},\"category_suggestion\":false,\"commit\":true}"
 				},
 				"url": {
-					"raw": "https://{{base_url}}/nga/api/v1.7{{account_ID}}/klfst/{{anuncioID}}/actions",
+					"raw": "https://{{base_url}}/nga/api/v1.7{{url_account_ID}}/klfst/{{anuncioID}}/actions",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
@@ -487,10 +696,85 @@
 					"path": [
 						"nga",
 						"api",
-						"v1.7{{account_ID}}",
+						"v1.7{{url_account_ID}}",
 						"klfst",
 						"{{anuncioID}}",
 						"actions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar Password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "94b809cb-9930-442c-be28-46f094910524",
+						"exec": [
+							"var password = (Math.floor(Math.random() * Math.floor(99999999999999999) + 10000)).toString(36)\r",
+							"console.log(password)\r",
+							"pm.environment.set(\"password\", password)\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "04d9efb9-d506-4f12-8fd2-f6e2a9ece324",
+						"exec": [
+							"var preencode = (pm.environment.get(\"mail\")).concat(\":\", (pm.environment.get(\"password\")))\r",
+							"var encoded = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(preencode))\r",
+							"var uuid = pm.environment.get(\"uuid\")\r",
+							"pm.environment.set(\"base64\", encoded)\r",
+							"\r",
+							"pm.test(\"Validar OK status\", function () {\r",
+							"    pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Validar uuid\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(uuid)\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json;charset=UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"account\":{\"password\":\"{{password}}\"}}"
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1/private/accounts/{{accountId}}",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1",
+						"private",
+						"accounts",
+						"{{accountId}}"
 					]
 				}
 			},
